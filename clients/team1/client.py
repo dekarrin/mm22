@@ -26,9 +26,9 @@ def initialResponse():
                 {"CharacterName": "Rebecca",
                  "ClassId": "Paladin"},
                 {"CharacterName": "Eric",
-                 "ClassId": "Assassin"},
+                 "ClassId": "Paladin"},
                 {"CharacterName": "Amanda",
-                 "ClassId": "Assassin"},
+                 "ClassId": "Paladin"},
             ]}
 # ---------------------------------------------------------------------
 
@@ -244,12 +244,11 @@ def processTurn(serverResponse):
 
                 # break CC if druid is stunned or silenced if it's off cooldown
                 if character.attributes.stunned < 0 or character.attributes.rooted < 0:
-                    cooldown = character.abilities['0']
+                    cooldown = character.abilities[0]
                     if cooldown == 0:
                         actions.append({
                             "Action": "Cast",
                             "CharacterId": character.id,
-                            # Am I buffing or debuffing? If buffing, target myself
                             "TargetId": character.id,
                             "AbilityId": 0
                         })
@@ -257,7 +256,7 @@ def processTurn(serverResponse):
 
                 if not done:
                     if character.in_range_of(target, gameMap):
-                        cooldown = character.abilities['11']
+                        cooldown = character.abilities[11]
                         if cooldown == 0:
                             actions.append({
                                 "Action": "Cast",
@@ -287,7 +286,7 @@ def processTurn(serverResponse):
                             "TargetId": target.id,
                         })
                     else: # Not in range, move towards, might as well sprint if we can
-                        cooldown = character.abilities['12']
+                        cooldown = character.abilities[12]
                         if cooldown == 0:
                             actions.append({
                                 "Action": "Cast",
@@ -310,7 +309,7 @@ def processTurn(serverResponse):
 
                 # break CC if druid is stunned or silenced if it's off cooldown
                 if character.attributes.stunned < 0 or character.attributes.silenced < 0 or character.attributes.rooted < 0:
-                    cooldown = character.abilities['0']
+                    cooldown = character.abilities[0]
                     if cooldown == 0:
                         actions.append({
                             "Action": "Cast",
@@ -329,7 +328,7 @@ def processTurn(serverResponse):
 
                 # See if we need to heal our ally
                 if not done:
-                    cooldown = character.abilities['3']
+                    cooldown = character.abilities[3]
                     if cooldown == 0:
                         for ally in myteam:
                             healthLost = ally.attributes.maxHealth - ally.attributes.health
@@ -346,7 +345,7 @@ def processTurn(serverResponse):
 
                 # stun something if they are casting, if they have a caster, otherwise just stun something
                 if not done:
-                    cooldown = character.abilities['14']  # stun
+                    cooldown = character.abilities[14]  # stun
                     if cooldown == 0:
                         enemy_has_caster = False
                         for enemy in enemyteam:
@@ -359,7 +358,6 @@ def processTurn(serverResponse):
                                     actions.append({
                                         "Action": "Cast",
                                         "CharacterId": character.id,
-                                        # Am I buffing or debuffing? If buffing, target myself
                                         "TargetId": enemy.id,
                                         "AbilityId": 14
                                     })
