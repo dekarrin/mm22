@@ -24,7 +24,7 @@ def initialResponse():
     return {'TeamName': teamName,
             'Characters': [
                 {"CharacterName": "Rebecca",
-                 "ClassId": "Assassin"},
+                 "ClassId": "Paladin"},
                 {"CharacterName": "Eric",
                  "ClassId": "Assassin"},
                 {"CharacterName": "Amanda",
@@ -268,15 +268,15 @@ def processTurn(serverResponse):
                             done = True
 
                 # If i'm dying, run away
-                if not done:
-                    if character.attributes.health < 500:
-                        print "we are hurt"
-                        actions.append({
-                            "Action": "Move",
-                            "CharacterId": character.id,
-                            "Location": (1, 4),
-                        })
-                        done = True
+                # if not done:
+                #     if character.attributes.health < 500:
+                #         print "we are hurt"
+                #         actions.append({
+                #             "Action": "Move",
+                #             "CharacterId": character.id,
+                #             "Location": (1, 4),
+                #         })
+                #         done = True
 
                 # If I am in range, either move towards target
                 if not done:
