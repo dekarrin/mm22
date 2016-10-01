@@ -20,9 +20,9 @@ gameMap = GameMap()
 # --------------------------- SET THIS IS UP -------------------------
 teamName = "FuckWeLost"
 agents = [
-    team_agent.Agent('RebeccaFuck', 'Assassin', team_ai.default),
-    team_agent.Agent('EricFuck', 'Assassin', team_ai.default),
-    team_agent.Agent('AmandaFuck', 'Assassin', team_ai.default)
+    team_agent.Agent('RebeccaFuck', 'Assassin', team_ai.assassin),
+    team_agent.Agent('EricFuck', 'Assassin', team_ai.assassin),
+    team_agent.Agent('AmandaFuck', 'Assassin', team_ai.assassin)
 ]
 # ---------------------------------------------------------------------
 
