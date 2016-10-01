@@ -15,20 +15,36 @@ def archer(agent, gameState):
                 "AbilityId": 0
             }
 
-    if character.in_range_of(agent.target, gameState.map):
-        cooldown = character.abilities[12]
+    if character.in_range_of(agent.target, gameState.map) and character.name == 'Amanda' and agent.has_not_cast:
+        cooldown = character.abilities[2]
         if cooldown == 0:
+            agent.has_not_cast = False
             return {
                 "Action": "Cast",
                 "CharacterId": character.id,
                 "TargetId": agent.target.id,
-                "AbilityId": 12
+                "AbilityId": 2
             }
 
     # If i'm dying, run away if we haven't run before
-    if not agent.state == team_agent.STATE_RAN:
 
-        if character.attributes.health < 600:
+    # DONT RUN IF LAST ALIVE, FIGHT IT OUT
+    alive_people = 0
+    for ally in gameState.teams['allies']:
+        if not ally.is_dead():
+            alive_people += 1
+
+
+    #check if they have 3 archers
+    number_of_archassins = 0
+    for enemy in gameState.teams['enemies']:
+        if enemy.classId == 'Assassin' or enemy.classId == 'Archer':
+            number_of_archassins += 1
+
+    if not agent.state == team_agent.STATE_RAN and alive_people > 1:
+        if number_of_archassins == 3 and alive_people == 3:
+            pass
+        elif character.attributes.health < 800:
             escaped = True
             for enemy in gameState.teams['enemies']:
                 if abs(enemy.position[0] - character.position[0]) <= 2:
@@ -41,11 +57,19 @@ def archer(agent, gameState):
 
             print "we are hurt"
             destination = agent.get_best_location()
-            return {
-                "Action": "Move",
-                "CharacterId": character.id,
-                "Location": destination,
-            }
+            if destination is None:
+                return {
+                    "Action": "Cast",
+                    "CharacterId": character.id,
+                    "TargetId": character.id,
+                    "AbilityId": 12
+                }
+            else:
+                return {
+                    "Action": "Move",
+                    "CharacterId": character.id,
+                    "Location": destination,
+                }
 
     # If I am in range, either move towards target or attack if in range
     if character.in_range_of(agent.target, gameState.map):
@@ -58,14 +82,16 @@ def archer(agent, gameState):
 
     else:  # Not in range, move towards, might as well sprint if we can
         agent.turnsmoving += 1
-        cooldown = character.abilities[12]
-        if cooldown == 0:
-            return {
-                "Action": "Cast",
-                "CharacterId": character.id,
-                "TargetId": character.id,
-                "AbilityId": 12
-            }
+        if 1 == 2:
+            pass
+        # cooldown = character.abilities[12]
+        # if cooldown == 0:
+        #     return {
+        #         "Action": "Cast",
+        #         "CharacterId": character.id,
+        #         "TargetId": character.id,
+        #         "AbilityId": 12
+        #     }
         else:
             if character.attributes.movementSpeed == 2:
                 if agent.turnsmoving > 10:
@@ -201,10 +227,17 @@ def assassin(agent, gameState):
                 "AbilityId": 11
             }
 
+    # check if they have 3 archers
+    number_of_archers = 0
+    for enemy in gameState.teams['enemies']:
+        if enemy.classId == 'Archer':
+            number_of_archers += 1
+
     # If i'm dying, run away if we haven't run before
     if not agent.state == team_agent.STATE_RAN:
-
-        if character.attributes.health < 500:
+        if number_of_archers >= 2:
+            pass
+        elif character.attributes.health < 600:
             escaped = True
             for enemy in gameState.teams['enemies']:
                 if abs(enemy.position[0] - character.position[0]) <= 2:
