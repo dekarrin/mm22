@@ -49,7 +49,6 @@ def archer(agent, gameState):
             for enemy in gameState.teams['enemies']:
                 if abs(enemy.position[0] - character.position[0]) <= 2:
                     escaped = False
-
             if escaped:
                 agent.state = team_agent.STATE_RAN
             else:
@@ -227,15 +226,21 @@ def assassin(agent, gameState):
                 "AbilityId": 11
             }
 
+    # DONT RUN IF LAST ALIVE, FIGHT IT OUT
+    alive_people = 0
+    for ally in gameState.teams['allies']:
+        if not ally.is_dead():
+            alive_people += 1
+
     # check if they have 3 archers
-    number_of_archassins = 0
+    number_of_archers = 0
     for enemy in gameState.teams['enemies']:
-        if enemy.classId == 'Archer' or enemy.classId == 'Assassin':
-            number_of_archassins += 1
+        if enemy.classId == 'Archer':
+            number_of_archers += 1
 
     # If i'm dying, run away if we haven't run before
     if not agent.state == team_agent.STATE_RAN:
-        if number_of_archassins >= 2:
+        if number_of_archers >= 2 and alive_people == 3:
             pass
         elif character.attributes.health < 600:
             escaped = True
