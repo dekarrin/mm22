@@ -130,6 +130,7 @@ def assassin(agent, gameState):
                 "AbilityId": 12
             }
         else:
+            agent.setChasing()
             return {
                 "Action": "Move",
                 "CharacterId": character.id,

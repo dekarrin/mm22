@@ -17,13 +17,41 @@ class Agent(object):
         self.name = name
         self.target = None
         self.state = STATE_DEFAULT
+        self.chasedOnThisTurn = False # Whether we chased the target on this turn. Reset to False at start of each getAction
+        self.chaseTarget = None # The target we are currently tracking chase history for. Persists across calls to chaseTarget
+        self.chaseCounter = 0 # The number of turns that we have been chasing chaseTarget for. Resets when we stop chasing
+        self.move_history = list()
         
     def getAction(self, gameState):
-        self.target = self.selectTarget(gameState)
+        self.chasedOnThisTurn = False
         self.charInfo = [x for x in gameState.teams['allies'] if x.name == self.name][0]
         if self.target:
+            # make sure our target doesn't have stale info
+            self.target = [x for x in gameState.teams['enemies'] if x.id == self.target.id][0]
+        if not self.target or self.target.is_dead()
+            self.target = self.selectTarget(gameState)
+        if self.target:
             action = self.ai_func(self, gameState)
+        if not self.chasedOnThisTurn:
+            self.chaseTarget = None
+            self.chaseCounter = 0
         return action
+        
+    def setChasing(self):
+        self.chasedOnThisTurn = True
+        if self.target.id == self.chaseTarget:
+            self.chaseCounter += 1
+        else:
+            self.chaseTarget = self.target.id
+            self.chaseCounter = 0
+        
+    def addToMoveHistory(self, action):
+        if len(self.move_history) > 5:
+            self.move_history.remove(0)
+        self.move_history.append(action)
+        
+    def targetIsDead(self, gameState):
+        target [gameState.teams['enemies']
         
     def selectTarget(self, gameState):
         # Caster list aka things we can interrupt
@@ -41,6 +69,7 @@ class Agent(object):
             'Enchanter',
             'Sorcerer',
             'Wizard',
+            'Archer',
             'Assassin',
             'Archer',
             'Paladin',
@@ -49,16 +78,16 @@ class Agent(object):
         
         target = None
         target_order = []
-
-        for priority in priority_list:
-            for character in gameState.teams['enemies']:
-                if character.classId == priority:
-                    if not character.is_dead():
-                        target_order.append(character)
+        
+        target_order = [x for x in gameState.teams['enemies'] if not x.is_dead()]
+        target_order.sort(key=lambda target: (8-priority_list.index(target.classId)) if not self.chaseLimitExceeded(target.id) else -1)
 
         if len(target_order) > 0:
             target = target_order[0]
         return target
+        
+    def chaseLimitExceeded(self, id):
+        return self.chaseTarget == id and 
         
     def get_best_location(self):
         character = self.charInfo

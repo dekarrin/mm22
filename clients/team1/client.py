@@ -16,17 +16,6 @@ import team_agent
 # Game map that you can use to query 
 gameMap = GameMap()
 
-runState = {
-    'Rebecca': False,
-    'Eric': False,
-    'Amanda': False
-}
-
-hasRunState = {
-    'Rebecca': False,
-    'Eric': False,
-    'Amanda': False
-}
 
 # --------------------------- SET THIS IS UP -------------------------
 teamName = "WizardCats"
@@ -57,9 +46,6 @@ def initialResponse():
 def processTurn(serverResponse):
     global gameMap
 # --------------------------- CHANGE THIS SECTION -------------------------
-
-    global runState
-    global hasRunState
 
     # Setup helper variables
     actions = []
