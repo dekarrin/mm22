@@ -29,11 +29,11 @@ hasRunState = {
 }
 
 # --------------------------- SET THIS IS UP -------------------------
-teamName = "WizardCats"
+teamName = "KizardWats"
 agents = [
     team_agent.Agent('Rebecca', 'Archer', team_ai.archer),
-    team_agent.Agent('Eric', 'Archer', team_ai.archer),
-    team_agent.Agent('Amanda', 'Archer', team_ai.archer)
+    team_agent.Agent('Eric', 'Assassin', team_ai.assassin),
+    team_agent.Agent('Amanda', 'Assassin', team_ai.assassin)
 ]
 # ---------------------------------------------------------------------
 

@@ -41,35 +41,35 @@ def archer(agent, gameState):
         if enemy.classId == 'Assassin' or enemy.classId == 'Archer':
             number_of_archassins += 1
 
-    if not agent.state == team_agent.STATE_RAN and alive_people > 1:
-        if number_of_archassins == 3 and alive_people == 3:
-            pass
-        elif character.attributes.health < 800:
-            escaped = True
-            for enemy in gameState.teams['enemies']:
-                if abs(enemy.position[0] - character.position[0]) <= 2:
-                    escaped = False
-
-            if escaped:
-                agent.state = team_agent.STATE_RAN
-            else:
-                agent.state = team_agent.STATE_RUNNING
-
-            print "we are hurt"
-            destination = agent.get_best_location()
-            if destination is None:
-                return {
-                    "Action": "Cast",
-                    "CharacterId": character.id,
-                    "TargetId": character.id,
-                    "AbilityId": 12
-                }
-            else:
-                return {
-                    "Action": "Move",
-                    "CharacterId": character.id,
-                    "Location": destination,
-                }
+    # if not agent.state == team_agent.STATE_RAN and alive_people > 1:
+    #     if number_of_archassins == 3 and alive_people == 3:
+    #         pass
+    #     elif character.attributes.health < 800:
+    #         escaped = True
+    #         for enemy in gameState.teams['enemies']:
+    #             if abs(enemy.position[0] - character.position[0]) <= 2:
+    #                 escaped = False
+    #
+    #         if escaped:
+    #             agent.state = team_agent.STATE_RAN
+    #         else:
+    #             agent.state = team_agent.STATE_RUNNING
+    #
+    #         print "we are hurt"
+    #         destination = agent.get_best_location()
+    #         if destination is None:
+    #             return {
+    #                 "Action": "Cast",
+    #                 "CharacterId": character.id,
+    #                 "TargetId": character.id,
+    #                 "AbilityId": 12
+    #             }
+    #         else:
+    #             return {
+    #                 "Action": "Move",
+    #                 "CharacterId": character.id,
+    #                 "Location": destination,
+    #             }
 
     # If I am in range, either move towards target or attack if in range
     if character.in_range_of(agent.target, gameState.map):
