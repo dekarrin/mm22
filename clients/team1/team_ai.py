@@ -1,3 +1,4 @@
+import team_agent
 import src.game.game_constants as game_consts
 
 def paladin(agent, gameState):
@@ -62,7 +63,17 @@ def paladin(agent, gameState):
 					"TargetId": agent.target.id,
 					"AbilityId": 14
 				}
-			
+	# If i'm dying, run away if we haven't run before
+	if not agent.state == team_agent.STATE_RAN:
+		if character.attributes.health < 500:
+			print "we are hurt"
+			destination = agent.get_best_location(character)
+			return {
+				"Action": "Move",
+				"CharacterId": character.id,
+				"Location": destination,
+			}
+				
 	# If I am in range, either move towards target
 	if character.in_range_of(agent.target, gameState.map):
 		return {
