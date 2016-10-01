@@ -16,24 +16,13 @@ import team_agent
 # Game map that you can use to query 
 gameMap = GameMap()
 
-runState = {
-    'Rebecca': False,
-    'Eric': False,
-    'Amanda': False
-}
-
-hasRunState = {
-    'Rebecca': False,
-    'Eric': False,
-    'Amanda': False
-}
 
 # --------------------------- SET THIS IS UP -------------------------
-teamName = "KizardWats"
+teamName = "PissardSats"
 agents = [
-    team_agent.Agent('Rebecca', 'Archer', team_ai.archer),
-    team_agent.Agent('Eric', 'Assassin', team_ai.assassin),
-    team_agent.Agent('Amanda', 'Assassin', team_ai.assassin)
+    team_agent.Agent('RebeccaFuck', 'Assassin', team_ai.default),
+    team_agent.Agent('EricFuck', 'Assassin', team_ai.assassin),
+    team_agent.Agent('AmandaFuck', 'Assassin', team_ai.assassin)
 ]
 # ---------------------------------------------------------------------
 
@@ -51,15 +40,13 @@ def initialResponse():
             ]}
 # ---------------------------------------------------------------------
 
-
+turnNum = 1
+import pprint
 
 # Determine actions to take on a given turn, given the server response
 def processTurn(serverResponse):
-    global gameMap
+    global gameMap, turnNum
 # --------------------------- CHANGE THIS SECTION -------------------------
-
-    global runState
-    global hasRunState
 
     # Setup helper variables
     actions = []
@@ -83,6 +70,10 @@ def processTurn(serverResponse):
     for agent in agents:
         act = agent.getAction(gameState)
         actions.append(act)
+        
+    print "On Turn " + str(turnNum)
+    turnNum += 1
+    pprint.pprint(actions)
 
     # Send actions to the server
     return {

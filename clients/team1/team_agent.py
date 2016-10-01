@@ -81,6 +81,7 @@ class Agent(object):
         
         target_order = [x for x in gameState.teams['enemies'] if not x.is_dead()]
         target_order.sort(key=lambda target: (8-priority_list.index(target.classId)) if not self.chaseLimitExceeded(target.id) else -1)
+        
 
         if len(target_order) > 0:
             target = target_order[0]

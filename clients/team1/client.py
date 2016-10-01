@@ -40,11 +40,12 @@ def initialResponse():
             ]}
 # ---------------------------------------------------------------------
 
-
+turnNum = 1
+import pprint
 
 # Determine actions to take on a given turn, given the server response
 def processTurn(serverResponse):
-    global gameMap
+    global gameMap, turnNum
 # --------------------------- CHANGE THIS SECTION -------------------------
 
     # Setup helper variables
@@ -69,6 +70,10 @@ def processTurn(serverResponse):
     for agent in agents:
         act = agent.getAction(gameState)
         actions.append(act)
+        
+    print "On Turn " + str(turnNum)
+    turnNum += 1
+    pprint.pprint(actions)
 
     # Send actions to the server
     return {
