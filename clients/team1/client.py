@@ -13,6 +13,19 @@ from src.game.gamemap import *
 
 # Game map that you can use to query 
 gameMap = GameMap()
+curTurn = 0
+
+runState = {
+    'Rebecca': False,
+    'Eric': False,
+    'Amanda': False
+}
+
+hasRunState = {
+    'Rebecca': False,
+    'Eric': False,
+    'Amanda': False
+}
 
 # --------------------------- SET THIS IS UP -------------------------
 teamName = "WizardCats"
@@ -24,17 +37,78 @@ def initialResponse():
     return {'TeamName': teamName,
             'Characters': [
                 {"CharacterName": "Rebecca",
-                 "ClassId": "Paladin"},
+                 "ClassId": "Assassin"},
                 {"CharacterName": "Eric",
-                 "ClassId": "Paladin"},
+                 "ClassId": "Assassin"},
                 {"CharacterName": "Amanda",
-                 "ClassId": "Paladin"},
+                 "ClassId": "Assassin"},
             ]}
 # ---------------------------------------------------------------------
+def get_best_location(character):
+    print "me" + str(character.position)
+    # for enemy in enemyteam:
+        # print "enemy" + str(enemy.position)
+    if character.position == (2, 1):
+        # top, go up
+        destination = (2,0)
+
+    elif character.position == (1, 2):
+        # left, go left
+        destination = (0,2)
+
+    elif character.position == (2, 3):
+        # bottom, go down
+        destination = (2,4)
+
+    elif character.position == (3, 2):
+        # right, move right
+        destination = (4,2)
+
+    elif character.position == (2, 2):
+        # middle, go left
+        destination = (1,2)
+    else:
+        # we are in the perimeter, peruse around it
+        x = character.position[0]
+        y = character.position[1]
+        if x == 0:
+            if y == 0:
+                # top left, go right
+                destination = (x+1, y)
+            else:
+                # we are on the left, go up
+                destination = (x, y-1)
+        elif y == 0:
+            if x == 4:
+                # top right, go down
+                destination = (x, y+1)
+            #we are on the top, go left
+            else:
+                destination = (x+1, y)
+        elif x == 4:
+            if y == 4:
+                # bottom right, go left
+                destination = (x-1, y)
+            else:
+                #we are on the right, go down
+                destination = (x, y+1)
+        elif y == 4:
+            if x == 0:
+                # bottom left, go up
+                destination = (x, y-1)
+            else:
+                # we are on the bottom, go left
+                destination = (x-1, y)
+    return destination
+
 
 # Determine actions to take on a given turn, given the server response
 def processTurn(serverResponse):
 # --------------------------- CHANGE THIS SECTION -------------------------
+
+    global runState
+    global hasRunState
+
     # Setup helper variables
     actions = []
     myteam = []
@@ -266,16 +340,18 @@ def processTurn(serverResponse):
                             })
                             done = True
 
-                # If i'm dying, run away
-                # if not done:
-                #     if character.attributes.health < 500:
-                #         print "we are hurt"
-                #         actions.append({
-                #             "Action": "Move",
-                #             "CharacterId": character.id,
-                #             "Location": (1, 4),
-                #         })
-                #         done = True
+                # If i'm dying, run away if we haven't run before
+                has_run = hasRunState[character.name]
+                if not done and not has_run:
+                    if character.attributes.health < 500:
+                        print "we are hurt"
+                        destination = get_best_location(character)
+                        actions.append({
+                            "Action": "Move",
+                            "CharacterId": character.id,
+                            "Location": destination,
+                        })
+                        done = True
 
                 # If I am in range, either move towards target
                 if not done:
