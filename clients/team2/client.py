@@ -18,11 +18,11 @@ gameMap = GameMap()
 
 
 # --------------------------- SET THIS IS UP -------------------------
-teamName = "PissardSats"
+teamName = "FuckWeLost"
 agents = [
     team_agent.Agent('RebeccaFuck', 'Assassin', team_ai.default),
-    team_agent.Agent('EricFuck', 'Assassin', team_ai.assassin),
-    team_agent.Agent('AmandaFuck', 'Assassin', team_ai.assassin)
+    team_agent.Agent('EricFuck', 'Assassin', team_ai.default),
+    team_agent.Agent('AmandaFuck', 'Assassin', team_ai.default)
 ]
 # ---------------------------------------------------------------------
 
@@ -71,9 +71,9 @@ def processTurn(serverResponse):
         act = agent.getAction(gameState)
         actions.append(act)
         
-    print "On Turn " + str(turnNum)
+    #print "On Turn " + str(turnNum)
     turnNum += 1
-    pprint.pprint(actions)
+    #pprint.pprint(actions)
 
     # Send actions to the server
     return {

@@ -71,9 +71,9 @@ def processTurn(serverResponse):
         act = agent.getAction(gameState)
         actions.append(act)
         
-    print "On Turn " + str(turnNum)
+    #print "On Turn " + str(turnNum)
     turnNum += 1
-    pprint.pprint(actions)
+    #pprint.pprint(actions)
 
     # Send actions to the server
     return {

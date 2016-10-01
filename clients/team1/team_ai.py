@@ -343,13 +343,13 @@ def default(agent, gameState):
                 return {
                     "Action": "Attack",
                     "CharacterId": character.id,
-                    "TargetId": target.id,
+                    "TargetId": agent.target.id,
                 }
     else: # Not in range, move towards
         return {
             "Action": "Move",
             "CharacterId": character.id,
-            "TargetId": target.id,
+            "TargetId": agent.target.id,
         }
 
 def druid(agent, gameState):

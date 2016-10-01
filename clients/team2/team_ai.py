@@ -250,11 +250,19 @@ def assassin(agent, gameState):
 
             print "we are hurt"
             destination = agent.get_best_location()
-            return {
-                "Action": "Move",
-                "CharacterId": character.id,
-                "Location": destination,
-            }
+            if destination is None:
+                return {
+                    "Action": "Cast",
+                    "CharacterId": character.id,
+                    "TargetId": character.id,
+                    "AbilityId": 12
+                }
+            else:
+                return {
+                    "Action": "Move",
+                    "CharacterId": character.id,
+                    "Location": destination,
+                }
 
     # If I am in range, either move towards target
     if character.in_range_of(agent.target, gameState.map):
@@ -335,13 +343,13 @@ def default(agent, gameState):
                 return {
                     "Action": "Attack",
                     "CharacterId": character.id,
-                    "TargetId": target.id,
+                    "TargetId": agent.target.id,
                 }
     else: # Not in range, move towards
         return {
             "Action": "Move",
             "CharacterId": character.id,
-            "TargetId": target.id,
+            "TargetId": agent.target.id,
         }
 
 def druid(agent, gameState):
