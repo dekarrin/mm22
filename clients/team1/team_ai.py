@@ -228,14 +228,14 @@ def assassin(agent, gameState):
             }
 
     # check if they have 3 archers
-    number_of_archers = 0
+    number_of_archassins = 0
     for enemy in gameState.teams['enemies']:
-        if enemy.classId == 'Archer':
-            number_of_archers += 1
+        if enemy.classId == 'Archer' or enemy.classId == 'Assassin':
+            number_of_archassins += 1
 
     # If i'm dying, run away if we haven't run before
     if not agent.state == team_agent.STATE_RAN:
-        if number_of_archers >= 2:
+        if number_of_archassins >= 2:
             pass
         elif character.attributes.health < 600:
             escaped = True
