@@ -24,11 +24,11 @@ def initialResponse():
     return {'TeamName': teamName,
             'Characters': [
                 {"CharacterName": "Rebecca",
-                 "ClassId": "Wizard"},
+                 "ClassId": "Paladin"},
                 {"CharacterName": "Eric",
-                 "ClassId": "Wizard"},
+                 "ClassId": "Assassin"},
                 {"CharacterName": "Amanda",
-                 "ClassId": "Wizard"},
+                 "ClassId": "Assassin"},
             ]}
 # ---------------------------------------------------------------------
 
@@ -53,6 +53,15 @@ def processTurn(serverResponse):
                 enemyteam.append(character)
 # ------------------ You shouldn't change above but you can ---------------
 
+    # Caster list aka things we can interrupt
+    casters = [
+        'Druid',
+        'Enchanter',
+        'Sorcerer',
+        'Paladin',
+        'Wizard'
+    ]
+
     # Choose a target
     priority_list = [
         'Druid',
@@ -74,11 +83,87 @@ def processTurn(serverResponse):
                 if not character.is_dead():
                     target_order.append(character)
 
+    target = target_order[0]
+
     # If we found a target
     if target:
         for character in myteam:
 
             # druid ai
+            if character.classId == 'Druid':
+                done = False
+
+                # break CC if druid is stunned or silenced if it's off cooldown
+                if character.attributes.stunned < 0 or character.attributes.silenced < 0:
+                    cooldown = character.abilities['0']
+                    if cooldown == 0:
+                        actions.append({
+                            "Action": "Cast",
+                            "CharacterId": character.id,
+                            # Am I buffing or debuffing? If buffing, target myself
+                            "TargetId": character.id,
+                            "AbilityId": 0
+                        })
+                        done = True
+
+                # See if we are busy casting a spell
+                if not done:
+                    if character.casting:
+                        print "casting"
+                        done = True
+
+                # See if we need to heal our ally
+                if not done:
+                    cooldown = character.abilities['3']
+                    if cooldown == 0:
+                        for ally in myteam:
+                            healthLost = ally.attributes.maxHealth - ally.attributes.health
+                            if ally.attributes.health > 0 and healthLost >= 250:
+                                actions.append({
+                                    "Action": "Cast",
+                                    "CharacterId": character.id,
+                                    # Am I buffing or debuffing? If buffing, target myself
+                                    "TargetId": ally.id,
+                                    "AbilityId": 3
+                                })
+                                print "healing: " + str(ally.id)
+                                done = True
+
+                # If I am in range, either move towards target
+                if character.in_range_of(target, gameMap) and not done:
+                    # Am I already trying to cast something?
+                    if character.casting is None:
+                        cast = False
+                        for abilityId, cooldown in character.abilities.items():
+                            # Do I have an ability not on cooldown
+                            if cooldown == 0:
+                                pass
+                                # print abilityId, cooldown
+                                # If I can, then cast it
+                                # ability = game_consts.abilitiesList[int(abilityId)]
+                                # # Get ability
+                                # actions.append({
+                                #     "Action": "Cast",
+                                #     "CharacterId": character.id,
+                                #     # Am I buffing or debuffing? If buffing, target myself
+                                #     "TargetId": target.id if ability["StatChanges"][0]["Change"] < 0 else character.id,
+                                #     "AbilityId": int(abilityId)
+                                # })
+                                # cast = True
+                                # break
+                        # Was I able to cast something? otherwise attack
+                        if not cast:
+                            actions.append({
+                                "Action": "Attack",
+                                "CharacterId": character.id,
+                                "TargetId": target.id,
+                            })
+                else: # Not in range, move towards
+                    actions.append({
+                        "Action": "Move",
+                        "CharacterId": character.id,
+                        "TargetId": target.id,
+                    })
 
             # warrior ai
             if character.classId == 'Warrior':
@@ -119,11 +204,129 @@ def processTurn(serverResponse):
             # archer
 
             # assassin ai
+            if character.classId == 'Assassin':
+                # If I am in range, either move towards target
+                if character.in_range_of(target, gameMap):
+                    # Am I already trying to cast something?
+                    if character.casting is None:
+                        cast = False
+                        for abilityId, cooldown in character.abilities.items():
+                            # Do I have an ability not on cooldown
+                            if cooldown == 0:
+                                # If I can, then cast it
+                                ability = game_consts.abilitiesList[int(abilityId)]
+                                # Get ability
+                                actions.append({
+                                    "Action": "Cast",
+                                    "CharacterId": character.id,
+                                    # Am I buffing or debuffing? If buffing, target myself
+                                    "TargetId": target.id if ability["StatChanges"][0]["Change"] < 0 else character.id,
+                                    "AbilityId": int(abilityId)
+                                })
+                                cast = True
+                                break
+                        # Was I able to cast something? otherwise attack
+                        if not cast:
+                            actions.append({
+                                "Action": "Attack",
+                                "CharacterId": character.id,
+                                "TargetId": target.id,
+                            })
+                else: # Not in range, move towards
+                    actions.append({
+                        "Action": "Move",
+                        "CharacterId": character.id,
+                        "TargetId": target.id,
+                    })
 
             # enchanter
 
             # paladin
+            if character.classId == 'Paladin':
+                done = False
 
+                # break CC if druid is stunned or silenced if it's off cooldown
+                if character.attributes.stunned < 0 or character.attributes.silenced < 0:
+                    cooldown = character.abilities['0']
+                    if cooldown == 0:
+                        actions.append({
+                            "Action": "Cast",
+                            "CharacterId": character.id,
+                            # Am I buffing or debuffing? If buffing, target myself
+                            "TargetId": character.id,
+                            "AbilityId": 0
+                        })
+                        done = True
+
+                # See if we are busy casting a spell
+                if not done:
+                    if character.casting:
+                        print "casting"
+                        done = True
+
+                # See if we need to heal our ally
+                if not done:
+                    cooldown = character.abilities['3']
+                    if cooldown == 0:
+                        for ally in myteam:
+                            healthLost = ally.attributes.maxHealth - ally.attributes.health
+                            if ally.attributes.health > 0 and healthLost >= 250:
+                                actions.append({
+                                    "Action": "Cast",
+                                    "CharacterId": character.id,
+                                    # Am I buffing or debuffing? If buffing, target myself
+                                    "TargetId": ally.id,
+                                    "AbilityId": 3
+                                })
+                                print "healing: " + str(ally.id)
+                                done = True
+
+                # stun something if they are casting, if they have a caster
+                if not done:
+                    enemy_has_caster = False
+                    for enemy in enemyteam:
+                        if enemy.attributes.health > 0 and enemy in :
+
+                    cooldown = character.abilities['14'] #stun
+                    if cooldown == 0:
+                        for enemy in enemyteam:
+                            if enemy.
+
+                # If I am in range, either move towards target
+                if character.in_range_of(target, gameMap) and not done:
+                    # Am I already trying to cast something?
+                    if character.casting is None:
+                        cast = False
+                        for abilityId, cooldown in character.abilities.items():
+                            # Do I have an ability not on cooldown
+                            if cooldown == 0:
+                                pass
+                                # print abilityId, cooldown
+                                # If I can, then cast it
+                                # ability = game_consts.abilitiesList[int(abilityId)]
+                                # # Get ability
+                                # actions.append({
+                                #     "Action": "Cast",
+                                #     "CharacterId": character.id,
+                                #     # Am I buffing or debuffing? If buffing, target myself
+                                #     "TargetId": target.id if ability["StatChanges"][0]["Change"] < 0 else character.id,
+                                #     "AbilityId": int(abilityId)
+                                # })
+                                # cast = True
+                                # break
+                        # Was I able to cast something? otherwise attack
+                        if not cast:
+                            actions.append({
+                                "Action": "Attack",
+                                "CharacterId": character.id,
+                                "TargetId": target.id,
+                            })
+                else: # Not in range, move towards
+                    actions.append({
+                        "Action": "Move",
+                        "CharacterId": character.id,
+                        "TargetId": target.id,
+                    })
             # sorcerer
 
             # wizard
