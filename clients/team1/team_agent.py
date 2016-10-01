@@ -17,6 +17,7 @@ class Agent(object):
         self.name = name
         self.target = None
         self.state = STATE_DEFAULT
+        self.turnsmoving = 0
         
     def getAction(self, gameState):
         self.target = self.selectTarget(gameState)
