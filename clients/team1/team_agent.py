@@ -22,6 +22,7 @@ class Agent(object):
         self.chaseCounter = 0 # The number of turns that we have been chasing chaseTarget for. Resets when we stop chasing
         self.move_history = list()
         self.turnsmoving = 0
+        self.has_not_cast = True
         
     def getAction(self, gameState):
         self.chasedOnThisTurn = False
@@ -91,29 +92,50 @@ class Agent(object):
         return self.chaseTarget == id and 
         
     def get_best_location(self):
+
         character = self.charInfo
+
+        cooldown = character.abilities[12]
+        if cooldown == 0:
+            return None #return None so we can cast Sprint
+
         print "me" + str(character.position)
         # for enemy in enemyteam:
             # print "enemy" + str(enemy.position)
         if character.position == (2, 1):
             # top, go up
-            destination = (2,0)
+            if character.attributes.movementSpeed == 2:
+                destination = (3,0)
+            else:
+                destination = (2,0)
 
         elif character.position == (1, 2):
             # left, go left
-            destination = (0,2)
+            if character.attributes.movementSpeed == 2:
+                destination = (0,1)
+            else:
+                destination = (0,2)
 
         elif character.position == (2, 3):
             # bottom, go down
-            destination = (2,4)
+            if character.attributes.movementSpeed == 2:
+                destination = (1, 4)
+            else:
+                destination = (2, 4)
 
         elif character.position == (3, 2):
             # right, move right
-            destination = (4,2)
+            if character.attributes.movementSpeed == 2:
+                destination = (4, 3)
+            else:
+                destination = (4, 2)
 
         elif character.position == (2, 2):
             # middle, go left
-            destination = (1,2)
+            if character.attributes.movementSpeed == 2:
+                destination = (0, 2)
+            else:
+                destination = (1, 2)
         else:
             # we are in the perimeter, peruse around it
             x = character.position[0]
