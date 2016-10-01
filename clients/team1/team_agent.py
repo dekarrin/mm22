@@ -21,6 +21,7 @@ class Agent(object):
         self.chaseTarget = None # The target we are currently tracking chase history for. Persists across calls to chaseTarget
         self.chaseCounter = 0 # The number of turns that we have been chasing chaseTarget for. Resets when we stop chasing
         self.move_history = list()
+        self.turnsmoving = 0
         
     def getAction(self, gameState):
         self.chasedOnThisTurn = False

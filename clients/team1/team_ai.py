@@ -1,6 +1,104 @@
 import team_agent
 import src.game.game_constants as game_consts
 
+def archer(agent, gameState):
+    character = agent.charInfo
+
+    # break CC if druid is stunned or silenced if it's off cooldown
+    if character.attributes.stunned < 0 or character.attributes.rooted < 0:
+        cooldown = character.abilities[0]
+        if cooldown == 0:
+            return {
+                "Action": "Cast",
+                "CharacterId": character.id,
+                "TargetId": character.id,
+                "AbilityId": 0
+            }
+
+    if character.in_range_of(agent.target, gameState.map):
+        cooldown = character.abilities[12]
+        if cooldown == 0:
+            return {
+                "Action": "Cast",
+                "CharacterId": character.id,
+                "TargetId": agent.target.id,
+                "AbilityId": 12
+            }
+
+    # If i'm dying, run away if we haven't run before
+    if not agent.state == team_agent.STATE_RAN:
+
+        if character.attributes.health < 600:
+            escaped = True
+            for enemy in gameState.teams['enemies']:
+                if abs(enemy.position[0] - character.position[0]) <= 2:
+                    escaped = False
+
+            if escaped:
+                agent.state = team_agent.STATE_RAN
+            else:
+                agent.state = team_agent.STATE_RUNNING
+
+            print "we are hurt"
+            destination = agent.get_best_location()
+            return {
+                "Action": "Move",
+                "CharacterId": character.id,
+                "Location": destination,
+            }
+
+    # If I am in range, either move towards target or attack if in range
+    if character.in_range_of(agent.target, gameState.map):
+        agent.turnsmoving = 0
+        return {
+            "Action": "Attack",
+            "CharacterId": character.id,
+            "TargetId": agent.target.id,
+        }
+
+    else:  # Not in range, move towards, might as well sprint if we can
+        agent.turnsmoving += 1
+        cooldown = character.abilities[12]
+        if cooldown == 0:
+            return {
+                "Action": "Cast",
+                "CharacterId": character.id,
+                "TargetId": character.id,
+                "AbilityId": 12
+            }
+        else:
+            if character.attributes.movementSpeed == 2:
+                if agent.turnsmoving > 10:
+                    if character.position == (0, 1):
+                        return {
+                            "Action": "Move",
+                            "CharacterId": character.id,
+                            "Location": (1, 0),
+                        }
+                    if character.position == (3, 0):
+                        return {
+                            "Action": "Move",
+                            "CharacterId": character.id,
+                            "Location": (4, 1),
+                        }
+                    if character.position == (4, 3):
+                        return {
+                            "Action": "Move",
+                            "CharacterId": character.id,
+                            "Location": (3, 4),
+                        }
+                    if character.position == (1, 4):
+                        return {
+                            "Action": "Move",
+                            "CharacterId": character.id,
+                            "Location": (0, 3),
+                        }
+            return {
+                "Action": "Move",
+                "CharacterId": character.id,
+                "TargetId": agent.target.id,
+            }
+
 def paladin(agent, gameState):
     character = agent.charInfo
     
@@ -78,6 +176,7 @@ def paladin(agent, gameState):
             "TargetId": agent.target.id,
         }
 
+
 def assassin(agent, gameState):
     character = agent.charInfo
 
@@ -104,7 +203,18 @@ def assassin(agent, gameState):
 
     # If i'm dying, run away if we haven't run before
     if not agent.state == team_agent.STATE_RAN:
+
         if character.attributes.health < 500:
+            escaped = True
+            for enemy in gameState.teams['enemies']:
+                if abs(enemy.position[0] - character.position[0]) <= 2:
+                    escaped = False
+
+            if escaped:
+                agent.state = team_agent.STATE_RAN
+            else:
+                agent.state = team_agent.STATE_RUNNING
+
             print "we are hurt"
             destination = agent.get_best_location()
             return {
@@ -115,12 +225,15 @@ def assassin(agent, gameState):
 
     # If I am in range, either move towards target
     if character.in_range_of(agent.target, gameState.map):
+        agent.turnsmoving = 0
         return {
             "Action": "Attack",
             "CharacterId": character.id,
             "TargetId": agent.target.id,
         }
+
     else: # Not in range, move towards, might as well sprint if we can
+        agent.turnsmoving = agent.turnsmoving + 1
         cooldown = character.abilities[12]
         if cooldown == 0:
             return {
@@ -131,6 +244,33 @@ def assassin(agent, gameState):
             }
         else:
             agent.setChasing()
+            # corner chase :D
+            if character.attributes.movementSpeed == 2:
+                if agent.turnsmoving > 10:
+                    if character.position == (0, 1):
+                        return {
+                            "Action": "Move",
+                            "CharacterId": character.id,
+                            "Location": (1, 0),
+                        }
+                    if character.position == (3, 0):
+                        return {
+                            "Action": "Move",
+                            "CharacterId": character.id,
+                            "Location": (4, 1),
+                        }
+                    if character.position == (4, 3):
+                        return {
+                            "Action": "Move",
+                            "CharacterId": character.id,
+                            "Location": (3, 4),
+                        }
+                    if character.position == (1, 4):
+                        return {
+                            "Action": "Move",
+                            "CharacterId": character.id,
+                            "Location": (0, 3),
+                        }
             return {
                 "Action": "Move",
                 "CharacterId": character.id,
