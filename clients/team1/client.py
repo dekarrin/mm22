@@ -24,11 +24,11 @@ def initialResponse():
     return {'TeamName': teamName,
             'Characters': [
                 {"CharacterName": "Rebecca",
-                 "ClassId": "Druid"},
+                 "ClassId": "Wizard"},
                 {"CharacterName": "Eric",
-                 "ClassId": "Archer"},
+                 "ClassId": "Wizard"},
                 {"CharacterName": "Amanda",
-                 "ClassId": "Warrior"},
+                 "ClassId": "Wizard"},
             ]}
 # ---------------------------------------------------------------------
 
@@ -54,33 +54,114 @@ def processTurn(serverResponse):
 # ------------------ You shouldn't change above but you can ---------------
 
     # Choose a target
+    priority_list = [
+        'Druid',
+        'Enchanter',
+        'Sorcerer',
+        'Wizard',
+        'Assassin',
+        'Archer',
+        'Paladin',
+        'Warrior'
+    ]
+
     target = None
-    for character in enemyteam:
-        if not character.is_dead():
-            target = character
-            break
+    target_order = []
+
+    for priority in priority_list:
+        for character in enemyteam:
+            if character.classId == priority:
+                if not character.is_dead():
+                    target_order.append(character)
 
     # If we found a target
     if target:
+        for character in myteam:
 
-        pass #remove this when you add your AI
+            # druid ai
 
-        # druid ai
+            # warrior ai
+            if character.classId == 'Warrior':
+                # If I am in range, either move towards target
+                if character.in_range_of(target, gameMap):
+                    # Am I already trying to cast something?
+                    if character.casting is None:
+                        cast = False
+                        for abilityId, cooldown in character.abilities.items():
+                            # Do I have an ability not on cooldown
+                            if cooldown == 0:
+                                # If I can, then cast it
+                                ability = game_consts.abilitiesList[int(abilityId)]
+                                # Get ability
+                                actions.append({
+                                    "Action": "Cast",
+                                    "CharacterId": character.id,
+                                    # Am I buffing or debuffing? If buffing, target myself
+                                    "TargetId": target.id if ability["StatChanges"][0]["Change"] < 0 else character.id,
+                                    "AbilityId": int(abilityId)
+                                })
+                                cast = True
+                                break
+                        # Was I able to cast something? otherwise attack
+                        if not cast:
+                            actions.append({
+                                "Action": "Attack",
+                                "CharacterId": character.id,
+                                "TargetId": target.id,
+                            })
+                else: # Not in range, move towards
+                    actions.append({
+                        "Action": "Move",
+                        "CharacterId": character.id,
+                        "TargetId": target.id,
+                    })
 
-        # warrior ai
+            # archer
 
-        # archer
+            # assassin ai
 
-        # assassin ai
+            # enchanter
 
-        # enchanter
+            # paladin
 
-        # paladin
+            # sorcerer
 
-        # sorcerer
-
-        # wizard
-
+            # wizard
+            if character.classId == 'Wizard':
+                # If I am in range, either move towards target
+                if character.in_range_of(target, gameMap):
+                    # Am I already trying to cast something?
+                    if character.casting is None:
+                        cast = False
+                        for abilityId, cooldown in character.abilities.items():
+                            # Do I have an ability not on cooldown
+                            if cooldown == 0:
+                                # If I can, then cast it
+                                ability = game_consts.abilitiesList[int(abilityId)]
+                                # Get ability
+                                actions.append({
+                                    "Action": "Cast",
+                                    "CharacterId": character.id,
+                                    # Am I buffing or debuffing? If buffing, target myself
+                                    "TargetId": target.id if ability["StatChanges"][0][
+                                                                 "Change"] < 0 else character.id,
+                                    "AbilityId": int(abilityId)
+                                })
+                                cast = True
+                                break
+                        # Was I able to cast something? otherwise attack
+                        if not cast:
+                            actions.append({
+                                "Action": "Attack",
+                                "CharacterId": character.id,
+                                "TargetId": target.id,
+                            })
+                else:  # Not in range, move towards
+                    actions.append({
+                        "Action": "Move",
+                        "CharacterId": character.id,
+                        "TargetId": target.id,
+                    })
 
         # for character in myteam:
         #     # If I am in range, either move towards target
@@ -104,7 +185,7 @@ def processTurn(serverResponse):
         #                     cast = True
         #                     break
         #             # Was I able to cast something? Either wise attack
-        #             if not cast:
+        #            if not cast:
         #                 actions.append({
         #                     "Action": "Attack",
         #                     "CharacterId": character.id,
